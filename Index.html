@@ -1,34 +1,113 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Location Share</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Location</title>
+
+<style>
+body{
+font-family:Arial,sans-serif;
+background:#0f172a;
+color:white;
+text-align:center;
+padding:30px;
+}
+
+.container{
+max-width:400px;
+margin:auto;
+background:#1e293b;
+padding:20px;
+border-radius:15px;
+box-shadow:0 0 20px rgba(0,0,0,.4);
+}
+
+button{
+background:#16a34a;
+color:white;
+padding:15px 25px;
+font-size:18px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+margin-top:20px;
+}
+
+button:hover{
+background:#15803d;
+}
+
+#status{
+margin-top:20px;
+font-size:18px;
+}
+
+a{
+color:#38bdf8;
+font-weight:bold;
+}
+</style>
+
 </head>
-<body style="font-family:Arial;text-align:center;margin-top:50px;">
+<body>
 
-<h2>Share Your Location</h2>
+<div class="container">
 
-<button onclick="getLocation()">Share Location</button>
+<h2>📍 Live Location Sharing</h2>
 
-<p id="result"></p>
+<p>Press the button and allow location access.</p>
+
+<button onclick="startTracking()">Share Live Location</button>
+
+<div id="status"></div>
+
+</div>
 
 <script>
-function getLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-      let lat = position.coords.latitude;
-      let lon = position.coords.longitude;
 
-      document.getElementById("result").innerHTML =
-      "Latitude: " + lat + "<br>Longitude: " + lon +
-      "<br><br><a target='_blank' href='https://maps.google.com/?q=" + lat + "," + lon + "'>Open Google Maps</a>";
+let watchID;
 
-    }, function() {
-      alert("Location permission denied.");
-    });
-  } else {
-    alert("Geolocation is not supported.");
-  }
+function startTracking(){
+
+if(navigator.geolocation){
+
+watchID=navigator.geolocation.watchPosition(showLocation,error,{
+enableHighAccuracy:true,
+maximumAge:0,
+timeout:5000
+});
+
+}else{
+
+document.getElementById("status").innerHTML="Geolocation not supported.";
+
 }
+
+}
+
+function showLocation(position){
+
+let lat=position.coords.latitude;
+let lon=position.coords.longitude;
+let acc=position.coords.accuracy;
+
+document.getElementById("status").innerHTML=
+
+"<b>Latitude:</b> "+lat+
+"<br><b>Longitude:</b> "+lon+
+"<br><b>Accuracy:</b> "+Math.round(acc)+" meters"+
+"<br><br><a target='_blank' href='https://maps.google.com/?q="+lat+","+lon+"'>Open Google Maps</a>";
+
+}
+
+function error(err){
+
+document.getElementById("status").innerHTML=
+"Location permission denied or unavailable.";
+
+}
+
 </script>
 
 </body>
