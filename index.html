@@ -1,36 +1,26 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Location Share</title>
-</head>
-<body style="font-family:Arial;text-align:center;margin-top:50px;">
-
-<h2>Live Location Share</h2>
-
-<p id="status">Location ka intezar...</p>
-
-<button onclick="shareLocation()">Location Share Karein</button>
-
 <script>
 function shareLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-
-      let lat = position.coords.latitude;
-      let lon = position.coords.longitude;
-
-      document.getElementById("status").innerHTML =
-      "Latitude: " + lat + "<br>Longitude: " + lon;
-
-    }, function(error){
-      alert("Location permission deny ho gayi.");
-    });
-  } else {
+  if (!navigator.geolocation) {
     alert("Geolocation supported nahi hai.");
+    return;
   }
+
+  navigator.geolocation.getCurrentPosition(function(position) {
+
+    let lat = position.coords.latitude;
+    let lng = position.coords.longitude;
+
+    let maps =
+      "https://www.google.com/maps?q=" + lat + "," + lng;
+
+    let phone = "923023991723"; // Apna WhatsApp number likhein
+    let text = "Meri Live Location: " + maps;
+
+    window.location.href =
+      "https://wa.me/" + phone + "?text=" + encodeURIComponent(text);
+
+  }, function() {
+    alert("Location permission allow karein.");
+  });
 }
 </script>
-
-</body>
-</html>
