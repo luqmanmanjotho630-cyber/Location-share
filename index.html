@@ -1,71 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Location Share</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:Arial,sans-serif;
+background:#f5f5f5;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.box{
+background:#fff;
+padding:25px;
+border-radius:12px;
+box-shadow:0 0 15px rgba(0,0,0,.2);
+width:340px;
+text-align:center;
+}
+
+h2{
+margin-bottom:15px;
+}
+
+button{
+padding:12px 20px;
+font-size:17px;
+border:none;
+border-radius:8px;
+background:#2196F3;
+color:white;
+cursor:pointer;
+margin-top:15px;
+}
+
+button:hover{
+background:#1976D2;
+}
+
+#status{
+margin-top:20px;
+font-size:15px;
+line-height:24px;
+word-break:break-word;
+}
+
+a{
+color:blue;
+text-decoration:none;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>📍 Live Location Share</h2>
+
+<p id="status">
+Click the button to share your location.
+</p>
+
+<button onclick="getLocation()">
+Share Location
+</button>
+
+</div>
+
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
 import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDLMIRG2XcbTmezeZ7lfCJoQFzFXqJD0f8",
-  authDomain: "locationshare-5e04e.firebaseapp.com",
-  projectId: "locationshare-5e04e",
-  storageBucket: "locationshare-5e04e.firebasestorage.app",
-  messagingSenderId: "1078460289548",
-  appId: "1:1078460289548:web:68b39e23bd8ebfae451429",
-  measurementId: "G-TQW8JK8Q8G"
+
+apiKey: "AIzaSyDLMIRG2XcbTmezeZ7lfCJoQFzFXqJD0f8",
+
+authDomain: "locationshare-5e04e.firebaseapp.com",
+
+projectId: "locationshare-5e04e",
+
+storageBucket: "locationshare-5e04e.firebasestorage.app",
+
+messagingSenderId: "1078460289548",
+
+appId: "1:1078460289548:web:68b39e23bd8ebfae451429"
+
 };
 
 const app = initializeApp(firebaseConfig);
+
 const db = getFirestore(app);
 
-window.getLocation = function () {
+window.getLocation = function(){
 
-  if (!navigator.geolocation) {
-    document.getElementById("status").innerHTML = "Geolocation support nahi hai.";
-    return;
-  }
+if(!navigator.geolocation){
 
-  document.getElementById("status").innerHTML = "Location mil rahi hai...";
+document.getElementById("status").innerHTML="Geolocation not supported.";
 
-  navigator.geolocation.getCurrentPosition(
+return;
 
-    async function(position){
+}
 
-      const lat = position.coords.latitude;
-      const lon = position.coords.longitude;
+document.getElementById("status").innerHTML="Getting location...";
 
-      try{
+navigator.geolocation.getCurrentPosition(
 
-        await addDoc(collection(db,"locations"),{
-          latitude: lat,
-          longitude: lon,
-          createdAt: serverTimestamp()
-        });
+async(position)=>{
 
-        document.getElementById("status").innerHTML =
-        "✅ Location successfully share ho gayi.";
+const lat=position.coords.latitude;
 
-      }catch(err){
+const lon=position.coords.longitude;
 
-        document.getElementById("status").innerHTML =
-        "Firebase Error: " + err.message;
+const mapLink=`https://maps.google.com/?q=${lat},${lon}`;
 
-      }
+try{
 
-    },
+await addDoc(collection(db,"locations"),{
 
-    function(){
+latitude:lat,
 
-      document.getElementById("status").innerHTML =
-      "Permission deny ya location nahi mili.";
+longitude:lon,
 
-    },
+map:mapLink,
 
-    {
-      enableHighAccuracy:true,
-      timeout:10000
-    }
+createdAt:serverTimestamp()
 
-  );
+});
+
+document.getElementById("status").innerHTML=`
+
+✅ <b>Location Shared Successfully</b><br><br>
+
+Latitude: ${lat}<br>
+
+Longitude: ${lon}<br><br>
+
+<a href="${mapLink}" target="_blank">
+
+Open in Google Maps
+
+</a>
+
+`;
+
+}catch(err){
+
+document.getElementById("status").innerHTML=
+
+"Firebase Error:<br>"+err.message;
+
+}
+
+},
+
+(error)=>{
+
+document.getElementById("status").innerHTML=
+
+"Permission denied or location unavailable.";
+
+},
+
+{
+
+enableHighAccuracy:true,
+
+timeout:10000
+
+}
+
+);
 
 }
 
 </script>
+
+</body>
+</html>
